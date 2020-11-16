@@ -216,7 +216,7 @@ function scanJsScripts(path, fileName, prefabPath) {
                     }
                     //（stringify 第三个参数用于表示格式化换行时空几格）
                     fs.writeFileSync(prefabPath, JSON.stringify(prefabJson, null, 4));
-                    
+
                     //绑定btn组件事件
                     for (let i = prefabJson.length - 1; i >= 0; i--) {
                         let one = prefabJson[i];
@@ -224,14 +224,18 @@ function scanJsScripts(path, fileName, prefabPath) {
                         if (_name) {
                             let para = _name.split("_");
                             if (m_validType.Button.indexOf(para[1]) != -1) {
+                                // 此时 i 对应的是名为 $_btn_xxx 的 node，并非 button
+                                let btnId = one._components[0].__id__;
+                                Editor.log(`btnId = ${btnId}`)
                                 // 获取btn所在的json内容
                                 let count = one._components.length;
-                                let btnAndBeforeJson = [...prefabJson.slice(0, i + 1 + count)];
+                                Editor.log(`count = ${count}`)
+                                let btnAndBeforeJson = [...prefabJson.slice(0, btnId + 1)];
                                 Editor.error(btnAndBeforeJson);
                                 Editor.error('--------');
 
                                 // 添加对应的 clickEvent 
-                                btnAndBeforeJson[btnAndBeforeJson.length - 1].clickEvents = { "__id__": i + 2 + count };
+                                btnAndBeforeJson[btnAndBeforeJson.length - 1].clickEvents = { "__id__": btnId + 1 };
 
                                 Editor.error('111111');
                                 let nodeIndex = 0;
@@ -268,13 +272,13 @@ function scanJsScripts(path, fileName, prefabPath) {
                                             if (Array.isArray(value)) {
                                                 for (let id of value) {
                                                     if (typeof id == "object") {
-                                                        if (typeof id.__id__ != "undefined" && id.__id__ > i + length) {
+                                                        if (typeof id.__id__ != "undefined" && id.__id__ > btnId + length) {
                                                             id.__id__ += 1;
                                                         }
                                                     }
                                                 }
                                             } else if (typeof value == "object") {
-                                                if (typeof value.__id__ != "undefined" && value.__id__ > i + length) {
+                                                if (typeof value.__id__ != "undefined" && value.__id__ > btnId + length) {
                                                     value.__id__ += 1;
                                                 }
                                             }
