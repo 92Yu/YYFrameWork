@@ -1,0 +1,15 @@
+{
+    "name": "scripts_generate",
+    "version": "1.0.0",
+    "description": "auto generate (.prefab/.fire)'s relative scripts",
+    "author": "MartinYing",
+    "main": "main.js",
+    "main-menu": {
+        "自制工具/所有预制和场景": {
+            "message": "scripts_generate:buildAll"
+        },
+        "自制工具/当前预制或场景": {
+            "message": "scripts_generate:buildCur"
+        }
+    }
+}

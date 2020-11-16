@@ -1,0 +1,12 @@
+{
+    "name": "tool_namecreator",
+    "version": "1.0.0",
+    "description": "生成名字，数据结构等智能提示",
+    "author": "MartinYing",
+    "main": "main.js",
+    "main-menu": {
+        "自制工具/生成名字智能提示": {
+            "message": "tool_namecreator:creator"
+        }
+    }
+}
