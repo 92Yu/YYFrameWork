@@ -227,8 +227,25 @@ function scanJsScripts(path, fileName, prefabPath) {
                                 // 此时 one 对应的是名为 $_btn_xxx 的 node，并非 button
                                 let btnId = one._components[0].__id__;
                                 let clickEventCount = prefabJson[btnId].clickEvents.length;
+                                let handlerName = getBtnHandlerName(para[2]);
                                 // Editor.log(`btnId = ${btnId}`)
-                                Editor.log(`clickEventCount = ${clickEventCount}`)
+                                // Editor.log(`clickEventCount = ${clickEventCount}`)
+
+                                // 判断是否已相同的点击回调事件
+                                if (clickEventCount) {
+                                    let hasSameEvent = false;
+                                    for (let kk = 0; kk < clickEventCount; kk++) {
+                                        let oldEvent = prefabJson[btnId + kk + 1];
+                                        if (oldEvent._componentId == result[1] && oldEvent.handler == handlerName) {
+                                            hasSameEvent = true;
+                                            break;
+                                        }
+                                    }
+                                    if (hasSameEvent) {
+                                        Editor.log(`${_name} 已有相同的点击回调事件，不再重复添加`)
+                                        continue;
+                                    }
+                                }
 
                                 // 下面会给btn增加一个点击事件，故，预先修改涉及到的id
                                 for (let single of prefabJson) {
@@ -292,7 +309,6 @@ function scanJsScripts(path, fileName, prefabPath) {
 
                                 // Editor.error('2222222');
                                 // 绑定点击事件  默认不传递自定义参数 命名为 onBtnXxxxClicked
-                                let handlerName = getBtnHandlerName(para[2]);
                                 btnAndBeforeJson.push({
                                     "__type__": "cc.ClickEvent",
                                     "target": {
