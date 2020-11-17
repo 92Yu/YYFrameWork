@@ -10,20 +10,25 @@
 // - Label              : Label/label
 // - Button             : Button/button/btn
 // - Sprite             : Sprite/sprite/sp
-// - ScrollView         : ScrollView/scrollview/sc
+// - ScrollView         : ScrollView/scrollView/scrollview/sc
 // - EditBox            : EditBox/editbox/eb
 // - Toggle             : Toggle/toggle/tg
-// - ToggleContainer    : ToggleContainer/togglecontainer/tgc
-// - ProgressBar        : ProgressBar/progressbar/pb
-// - Layout             : Layout/layout
-// - Widget             : Widget/widget
+// - ToggleContainer    : ToggleContainer/toggleContainer/togglecontainer/tgc
+// - ProgressBar        : ProgressBar/progressBar/progressbar/pb
 
 // 1.如果已经有同名的脚本则不会生成，检查脚本里面的属性，补足新的属性，删除没有对应节点的属性
 // 2.分别统计生成的脚本，修改的脚本，错误的命名节点， 在控制台输出相关属性
-// 3.脚本类型名，数据类型名自动替换，包括setData里面的数据类型名 
-// 4.同名属性检查，有同名属性会报错，并且不会生成或者修改ts脚本 
-// 5.脚本自动添加到预制和场景，属性自动绑定，减少手动拖的步骤 
-// 6.检查ts脚本的属性，节点树上没有对应名字的节点的话就删除这个属性声明
+// 3.同名属性检查，有同名属性会报错，并且不会生成或者修改ts脚本 
+// 4.脚本自动添加到预制和场景，属性自动绑定，减少手动拖的步骤 
+// 5.检查ts脚本的属性，节点树上没有对应名字的节点的话就删除这个属性声明
+
+/**
+ * TODO:
+ * 场景： 
+ *  1. 各组件绑定时的自动查找
+ * 预制：
+ *  1. 对照场景修改相应的组件绑定以及btn回调函数绑定
+ */
 
 let fs = require('fs');
 
@@ -47,13 +52,11 @@ let m_validType = {
     Sprite: ['Sprite', 'sprite', 'sp'],
     Label: ['Label', 'label'],
     Button: ['Button', 'button', 'btn', 'bt'],
-    ScrollView: ['ScrollView', 'scrollView', 'sc'],
-    EditBox: ['EditBox', 'editbox', 'eb'],
+    ScrollView: ['ScrollView', 'scrollView', 'scrollview', 'sc'],
+    EditBox: ['EditBox', 'editbox', 'editBox', 'eb'],
     Toggle: ['Toggle', 'toggle', 'tg'],
-    ToggleContainer: ['ToggleContainer', 'togglecontainer', 'tgc'],
-    ProgressBar: ['ProgressBar', 'progressbar', 'pb'],
-    Layout: ['layout', 'Layout'],
-    Widget: ['widget', 'Widget']
+    ToggleContainer: ['ToggleContainer', 'togglecontainer', 'toggleContainer', 'tgc'],
+    ProgressBar: ['ProgressBar', 'progressbar', 'progressBar', 'pb']
 };
 
 //所有ts脚本文件
@@ -89,8 +92,7 @@ function insertStr(soure, start, newStr) {
 }
 
 /**
- * 查找 指定目录 下面的所有js文件 
- *   相当于更新预制/场景配置
+ * 查找所有js文件 ==> 更新预制/场景配置的js文件
  *
  * @param {*} path          查找目录
  * @param {*} fileName      查找文件名
@@ -195,19 +197,34 @@ function scanJsScripts(path, fileName, prefabPath) {
                                     if (m_validType.Node.indexOf(para[1]) != -1) {
                                         isNode = true;
                                     }
-                                    let index = i;
-                                    if (!isNode) {
-                                        index = i + 1;
-                                    }
+
+                                    // Editor.log(`-------`)
+                                    // Editor.log(`info._name: ${info._name}, isNode: ${isNode}`)
                                     // 绑定
-                                    if (m_validType.Button.indexOf(para[1]) != -1) {
-                                        // button 需要找到 _components 第一个 __id__
+                                    if (isNode) {
+                                        // Editor.log(`绑定node组件 ${info._name}, 对应的ID: ${i}`)
                                         prefabJson[prefabJson.length - 1][info._name] = {
-                                            "__id__": info._components[0].__id__
+                                            "__id__": i
                                         }
                                     } else {
-                                        prefabJson[prefabJson.length - 1][info._name] = {
-                                            "__id__": index
+                                        // 根据info的componentID，获取到每个component的name，从而进行对比
+                                        let compenentsLength = info._components.length;
+                                        for (let kk = 0; kk < compenentsLength; kk++) {
+                                            let infoType = '';
+                                            for (let key of Object.keys(m_validType)) {
+                                                if (-1 != m_validType[key].indexOf(para[1])) {
+                                                    infoType = 'cc.' + key;
+                                                    break;
+                                                }
+                                            }
+
+                                            let componentsId = info._components[kk].__id__;
+                                            if (prefabJson[componentsId].__type__ && prefabJson[componentsId].__type__ == infoType) {
+                                                // Editor.log(`绑定组件 ${info._name}, 对应的ID: ${componentsId}`)
+                                                prefabJson[prefabJson.length - 1][info._name] = {
+                                                    "__id__": componentsId
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -294,10 +311,7 @@ function scanJsScripts(path, fileName, prefabPath) {
                                 // Editor.error('--------');
 
                                 // 添加对应的 clickEvent 
-                                Editor.error(btnAndBeforeJson[btnAndBeforeJson.length - 1 - clickEventCount].clickEvents);
                                 btnAndBeforeJson[btnAndBeforeJson.length - 1 - clickEventCount].clickEvents.push({ "__id__": btnId + 1 + clickEventCount });
-                                Editor.log(`===========`)
-                                Editor.error(btnAndBeforeJson[btnAndBeforeJson.length - 1 - clickEventCount].clickEvents);
 
                                 // Editor.error('111111');
                                 let nodeIndex = 0;
@@ -354,12 +368,12 @@ function scanJsScripts(path, fileName, prefabPath) {
 /**
  * 处理ts脚本
  *
- * @param {*} json      预制或场景的json信息
- * @param {*} tsContent 要处理的ts代码内容(新建脚本时使用)
- * @param {*} isNewTs   是否是新的ts脚本
- * @param {*} prefabPath      预制/场景文件的路径
- * @param {*} fileName  ts文件名字
- * @param {*} out       脚本存放位置
+ * @param {*} json          预制或场景的json信息
+ * @param {*} tsContent     要处理的ts代码内容(新建脚本时使用)
+ * @param {*} isNewTs       是否是新的ts脚本
+ * @param {*} prefabPath    预制/场景文件的路径
+ * @param {*} fileName      ts文件名字
+ * @param {*} out           脚本存放位置
  */
 function handleTs(json, tsContent, isNewTs, prefabPath, fileName, out) {
     // Editor.warn(`func handleTs ... `);
@@ -424,6 +438,7 @@ function handleTs(json, tsContent, isNewTs, prefabPath, fileName, out) {
                     for (let key of Object.keys(m_validType)) {
                         let value = m_validType[key];
                         if (value.indexOf(para[1]) != -1) {
+
                             canFind = true;
                             if (tsContent.indexOf(_name) == -1) {
                                 let matchArr = tsContent.match(/extends[^{]*/);
@@ -431,7 +446,7 @@ function handleTs(json, tsContent, isNewTs, prefabPath, fileName, out) {
                                 let property = `\n\t@property(cc.${key}) private ${_name}: cc.${key} = null;`;
                                 tsContent = insertStr(tsContent, pos, property);
 
-                                // 按钮需要自动创建回调函数
+                                // 按钮需要创建回调函数
                                 if (key == 'Button') {
                                     let handlerName = getBtnHandlerName(para[2]);
                                     if (tsContent.indexOf(handlerName) == -1) {
@@ -459,6 +474,7 @@ function handleTs(json, tsContent, isNewTs, prefabPath, fileName, out) {
             }
         }
     }
+
     if (_bValidType) {
         // 写入脚本文件
         if (!fs.existsSync(out)) {
@@ -477,10 +493,10 @@ function handleTs(json, tsContent, isNewTs, prefabPath, fileName, out) {
     }
 
     //更新import文件夹下面的js文件
-    // Editor.log(`handleTs 1111`)
+    Editor.log(`handleTs 1111`)
     Editor.assetdb.refresh('db://assets', function (err, results) {
-        // Editor.log(`handleTs 2222`)
         scanJsScripts(ProjectPath + "/library/imports", fileName, prefabPath);
+        Editor.log(`handleTs 2222`)
     });
 }
 
