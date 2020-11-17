@@ -10,7 +10,6 @@ export default class testScene extends cc.Component {
 	@property(cc.ProgressBar) private $_progressBar_pb1: cc.ProgressBar = null;
 	@property(cc.EditBox) private $_editbox_eb1: cc.EditBox = null;
 	@property(cc.Toggle) private $_toggle_tg1: cc.Toggle = null;
-	@property(cc.ToggleContainer) private $_toggleContainer_tgc1: cc.ToggleContainer = null;
 
     onLoad() {
         
@@ -31,5 +30,4 @@ export default class testScene extends cc.Component {
 	private onBtnBtn1Clicked() {
 
 	}
-
 }
