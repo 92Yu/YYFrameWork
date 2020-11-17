@@ -97,10 +97,10 @@ function insertStr(soure, start, newStr) {
  * @param {*} prefabPath    预制/场景路径
  */
 function scanJsScripts(path, fileName, prefabPath) {
-    Editor.warn(`func scanJsScripts ... `)
-    Editor.log(` path ... ${path}`)
-    Editor.log(` fileName ... ${fileName}`)
-    Editor.log(` prefabPath ... ${prefabPath}`)
+    // Editor.warn(`func scanJsScripts ... `)
+    // Editor.log(` path ... ${path}`)
+    // Editor.log(` fileName ... ${fileName}`)
+    // Editor.log(` prefabPath ... ${prefabPath}`)
 
     fs.stat(path, (err, stats) => {
         if (err) {
@@ -215,7 +215,7 @@ function scanJsScripts(path, fileName, prefabPath) {
                         }
                     }
                     //（stringify 第三个参数用于表示格式化换行时空几格）
-                    fs.writeFileSync(prefabPath, JSON.stringify(prefabJson, null, 4));
+                    fs.writeFileSync(prefabPath, JSON.stringify(prefabJson, null, 2));
 
                     //绑定btn组件事件
                     for (let i = prefabJson.length - 1; i >= 0; i--) {
@@ -224,20 +224,65 @@ function scanJsScripts(path, fileName, prefabPath) {
                         if (_name) {
                             let para = _name.split("_");
                             if (m_validType.Button.indexOf(para[1]) != -1) {
-                                // 此时 i 对应的是名为 $_btn_xxx 的 node，并非 button
+                                // 此时 one 对应的是名为 $_btn_xxx 的 node，并非 button
                                 let btnId = one._components[0].__id__;
-                                Editor.log(`btnId = ${btnId}`)
-                                // 获取btn所在的json内容
-                                let count = one._components.length;
-                                Editor.log(`count = ${count}`)
-                                let btnAndBeforeJson = [...prefabJson.slice(0, btnId + 1)];
-                                Editor.error(btnAndBeforeJson);
-                                Editor.error('--------');
+                                let clickEventCount = prefabJson[btnId].clickEvents.length;
+                                // Editor.log(`btnId = ${btnId}`)
+                                Editor.log(`clickEventCount = ${clickEventCount}`)
+
+                                // 下面会给btn增加一个点击事件，故，预先修改涉及到的id
+                                for (let single of prefabJson) {
+                                    for (let key of Object.keys(single)) {
+                                        let value = single[key];
+                                        if (value) {
+                                            if (Array.isArray(value)) {
+                                                for (let id of value) {
+                                                    if (typeof id == "object") {
+                                                        if (typeof id.__id__ != "undefined" && id.__id__ > btnId) {
+
+                                                            // Editor.log(`value is array`);
+                                                            // Editor.log(`single : ${single}`);
+                                                            // Editor.log(single)
+                                                            // Editor.log(`key : ${key}`);
+                                                            // Editor.log(key)
+                                                            // Editor.log(`value : ${value}`);
+                                                            // Editor.log(value)
+                                                            // Editor.log(`id : ${id}`);
+                                                            // Editor.log(id)
+                                                            // Editor.log(`id.__id__ : ${id.__id__}`);
+
+                                                            id.__id__ += 1;
+                                                        }
+                                                    }
+                                                }
+                                            } else if (typeof value == "object") {
+                                                if (typeof value.__id__ != "undefined" && value.__id__ > btnId) {
+                                                    // Editor.log(`value is object`);
+                                                    // Editor.log(`single : ${single}`);
+                                                    // Editor.log(`key : ${key}`);
+                                                    // Editor.log(`value : ${value}`);
+                                                    // Editor.log(`id : ${id}`);
+                                                    // Editor.log(`id.__id__ : ${id.__id__}`);
+
+                                                    value.__id__ += 1;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // 获取btn所在的json及其之前的内容
+                                let btnAndBeforeJson = [...prefabJson.slice(0, btnId + 1 + clickEventCount)];
+                                // Editor.error(btnAndBeforeJson);
+                                // Editor.error('--------');
 
                                 // 添加对应的 clickEvent 
-                                btnAndBeforeJson[btnAndBeforeJson.length - 1].clickEvents = { "__id__": btnId + 1 };
+                                Editor.error(btnAndBeforeJson[btnAndBeforeJson.length - 1 - clickEventCount].clickEvents);
+                                btnAndBeforeJson[btnAndBeforeJson.length - 1 - clickEventCount].clickEvents.push({ "__id__": btnId + 1 + clickEventCount });
+                                Editor.log(`===========`)
+                                Editor.error(btnAndBeforeJson[btnAndBeforeJson.length - 1 - clickEventCount].clickEvents);
 
-                                Editor.error('111111');
+                                // Editor.error('111111');
                                 let nodeIndex = 0;
                                 if (prefabPath.endsWith(".prefab")) {//预制
                                     nodeIndex = 1;
@@ -245,7 +290,7 @@ function scanJsScripts(path, fileName, prefabPath) {
                                     nodeIndex = 2;
                                 }
 
-                                Editor.error('2222222');
+                                // Editor.error('2222222');
                                 // 绑定点击事件  默认不传递自定义参数 命名为 onBtnXxxxClicked
                                 let handlerName = getBtnHandlerName(para[2]);
                                 btnAndBeforeJson.push({
@@ -259,39 +304,18 @@ function scanJsScripts(path, fileName, prefabPath) {
                                     "customEventData": ""
                                 });
 
-                                Editor.error('3333333');
-                                Editor.error(btnAndBeforeJson)
+                                // Editor.error('3333333');
+                                // Editor.error(btnAndBeforeJson)
 
-                                // 处理afterJson内部的id变化
-                                Editor.error('444444444')
-                                Editor.error(afterJson)
-                                for (const single of afterJson) {
-                                    for (let key of Object.keys(single)) {
-                                        let value = single[key];
-                                        if (value) {
-                                            if (Array.isArray(value)) {
-                                                for (let id of value) {
-                                                    if (typeof id == "object") {
-                                                        if (typeof id.__id__ != "undefined" && id.__id__ > btnId + length) {
-                                                            id.__id__ += 1;
-                                                        }
-                                                    }
-                                                }
-                                            } else if (typeof value == "object") {
-                                                if (typeof value.__id__ != "undefined" && value.__id__ > btnId + length) {
-                                                    value.__id__ += 1;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                Editor.error('555555555')
-                                Editor.error(afterJson)
+                                // 处理 prefabJson 内部的id变化
+                                let afterJson = [...prefabJson.slice(btnId + 1 + clickEventCount)];
+                                // Editor.error('444444444')
+                                // Editor.error(afterJson)
 
                                 prefabJson = btnAndBeforeJson.concat(afterJson);
-                                Editor.error(prefabJson)
+                                // Editor.error(prefabJson)
                                 //写入原来的文件
-                                fs.writeFileSync(prefabPath, JSON.stringify(prefabJson));
+                                fs.writeFileSync(prefabPath, JSON.stringify(prefabJson, null, 2));
                             }
                         }
                     }
@@ -322,13 +346,13 @@ function scanJsScripts(path, fileName, prefabPath) {
  * @param {*} out       脚本存放位置
  */
 function handleTs(json, tsContent, isNewTs, prefabPath, fileName, out) {
-    Editor.warn(`func handleTs ... `);
-    Editor.log(` json ... ${json}`);
-    Editor.log(` tsContent ... ${tsContent}`);
-    Editor.log(` isNewTs ... ${isNewTs}`);
-    Editor.log(` prefabPath ... ${prefabPath}`);
-    Editor.log(` fileName ... ${fileName}`);
-    Editor.log(` out ... ${out}`);
+    // Editor.warn(`func handleTs ... `);
+    // Editor.log(` json ... ${json}`);
+    // Editor.log(` tsContent ... ${tsContent}`);
+    // Editor.log(` isNewTs ... ${isNewTs}`);
+    // Editor.log(` prefabPath ... ${prefabPath}`);
+    // Editor.log(` fileName ... ${fileName}`);
+    // Editor.log(` out ... ${out}`);
     //生成的脚本信息
     let _generateInfo = null;
     //修改脚本信息
@@ -437,9 +461,9 @@ function handleTs(json, tsContent, isNewTs, prefabPath, fileName, out) {
     }
 
     //更新import文件夹下面的js文件
-    Editor.log(`handleTs 1111`)
+    // Editor.log(`handleTs 1111`)
     Editor.assetdb.refresh('db://assets', function (err, results) {
-        Editor.log(`handleTs 2222`)
+        // Editor.log(`handleTs 2222`)
         scanJsScripts(ProjectPath + "/library/imports", fileName, prefabPath);
     });
 }
@@ -453,10 +477,10 @@ function handleTs(json, tsContent, isNewTs, prefabPath, fileName, out) {
  * @param {*} outPath   要生成的脚本位置
  */
 function generateTsScript(filePath, fileName, outPath) {
-    Editor.warn(`func generateTsScript ... `);
-    Editor.log(` path: ${filePath}`);
-    Editor.log(` fileName: ${fileName}`);
-    Editor.log(` outPath: ${outPath}`);
+    // Editor.warn(`func generateTsScript ... `);
+    // Editor.log(` path: ${filePath}`);
+    // Editor.log(` fileName: ${fileName}`);
+    // Editor.log(` outPath: ${outPath}`);
     let json = JSON.parse(fs.readFileSync(filePath, "utf-8"));
 
     // 同步加载ts模板脚本文件
@@ -478,7 +502,7 @@ function generateTsScript(filePath, fileName, outPath) {
  * @param {*} outPath   路径下每个prefab或者scene对应的脚本输出目录
  */
 function loadAllPrefabScene(path, outPath) {
-    Editor.warn(`func loadAllPrefabScene ... `);
+    // Editor.warn(`func loadAllPrefabScene ... `);
     let tmp = fs.statSync(path);
     if (tmp.isFile()) {
         if (path.endsWith(".prefab") || path.endsWith(".fire")) {
@@ -501,8 +525,8 @@ function loadAllPrefabScene(path, outPath) {
  * @param {string} [path=ProjectPath + '/assets']
  */
 function loadAllScripts(path = ProjectPath + '/assets') {
-    Editor.warn(`func loadAllScripts ... `);
-    Editor.log(`path : ${path}`)
+    // Editor.warn(`func loadAllScripts ... `);
+    // Editor.log(`path : ${path}`)
     let tmp = fs.statSync(path);
     if (tmp.isFile()) {
         //只保存ts文件
@@ -521,9 +545,9 @@ module.exports = {
     messages: {
         buildCur() {
             Editor.log(`buildCur`);
-            // get cur select file uuid in assets panel
+            // 获取当前assets面板中选中资源的uuid
             let arrSelectAssets = Editor.Selection.curSelection('asset')[0];
-            // change file uuid to real path
+            // 转换uuid到实际路径
             let selectPath = Editor.assetdb.uuidToFspath(arrSelectAssets).replace(/\\/g, '\/');
             let bValid = false;
             let generateScriptPath = '';
@@ -542,13 +566,12 @@ module.exports = {
                 generateLogs = [];
                 modifyLogs = [];
 
-                // preload all scripts which type of ts
+                // 加载所有的ts脚本
                 loadAllScripts();
 
-                // load all prefab and scene under the path between parameters
+                // 加载设定好的路径里面的所有预制和场景文件
                 loadAllPrefabScene(selectPath, generateScriptPath);
 
-                // ouput generate log
                 if (errorLogs.length > 0) {
                     Editor.error('error :', errorLogs);
                 }
@@ -559,7 +582,7 @@ module.exports = {
                     Editor.warn('update scripts :', modifyLogs);
                 }
 
-                // update assets data
+                // 更新 assets 数据
                 Editor.warn('update assets data ... ');
                 Editor.assetdb.refresh('db://assets', function (err, results) {
                     Editor.warn('code generate end ... ');
