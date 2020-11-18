@@ -5,10 +5,7 @@
     "author": "MartinYing",
     "main": "main.js",
     "main-menu": {
-        "自制工具/所有预制和场景": {
-            "message": "scripts_generate:buildAll"
-        },
-        "自制工具/当前预制或场景": {
+        "扩展工具/当前预制or场景": {
             "message": "scripts_generate:buildCur"
         }
     }
