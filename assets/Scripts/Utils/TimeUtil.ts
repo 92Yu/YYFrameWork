@@ -2,7 +2,7 @@
  * 时间工具
  * TimeUtil.ts 
  */
-export default class TimeUtil {
+let TimeUtil = new class {
 
     /**
      * 获取当天指定时间的时间戳
@@ -43,4 +43,4 @@ export default class TimeUtil {
     }
 
 }
-window['yy'] && (window['yy']['TimeUtil'] = TimeUtil);
+window['TimeUtil'] = TimeUtil;

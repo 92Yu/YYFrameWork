@@ -2,7 +2,7 @@
  * 调试工具
  * DebugUtil.ts
  */
-export default class DebugUtil {
+let DebugUtil = new class{
 
     /**
      * 打出光彩夺目的日志（黑蓝白配色）
@@ -72,7 +72,5 @@ export default class DebugUtil {
     public static getDrawCalls(): number {
         return cc.renderer.drawCalls;
     }
-
 }
-
-window['yy'] && (window['yy']['DebugUtil'] = DebugUtil);
+window['DebugUtil'] = DebugUtil;

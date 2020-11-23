@@ -1,7 +1,7 @@
 /**
  * 数组工具
  */
-export default class ArrayUtil {
+let ArrayUtil = new class {
 
     /**
      * 复制二维数组
@@ -69,3 +69,4 @@ export default class ArrayUtil {
         return newArray;
     }
 }
+window['ArrayUtil'] = ArrayUtil;

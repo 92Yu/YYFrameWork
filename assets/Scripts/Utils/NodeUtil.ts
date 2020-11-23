@@ -2,7 +2,7 @@
  * 节点工具
  * NodeUtil.ts
  */
-export default class NodeUtil {
+let NodeUtil = new class {
 
     /**
      * 获取节点在目标节点（容器）下的相对位置
@@ -36,3 +36,4 @@ export default class NodeUtil {
         return contains ? rect2.containsRect(rect1) : rect2.intersects(rect1);
     }
 }
+Window['NodeUtil'] = NodeUtil;

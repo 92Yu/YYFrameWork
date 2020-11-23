@@ -2,7 +2,7 @@
  * 图像工具
  * ImageUtil.ts
  */
-export default class ImageUtil {
+let ImageUtil = new class{
 
     /**
      * 将图像转为 Base64 字符（仅 png、jpg 或 jpeg 格式资源）
@@ -63,5 +63,5 @@ export default class ImageUtil {
         }
         return new Blob([uint8Array], { type: type });
     }
-
 }
+window['ImageUtil'] = ImageUtil;

@@ -1,7 +1,7 @@
 /**
  * 数学工具
  */
-export default class MathUtil {
+let MathUtil = new class {
 
     /**
     * 获取一个 min 到 max 范围内的随机整数
@@ -46,5 +46,5 @@ export default class MathUtil {
     public static angleToRadian(angle: number): number {
         return angle * Math.PI / 180;
     }
-
 }
+window['MathUtil'] = MathUtil;

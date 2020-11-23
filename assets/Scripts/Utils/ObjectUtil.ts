@@ -2,7 +2,7 @@
  * 对象工具
  * ObjectUtil.ts
  */
-export default class ObjectUtil {
+let ObjectUtil = new class {
 
     /**
      * 判断指定的值是否为对象
@@ -69,3 +69,4 @@ export default class ObjectUtil {
         return result;
     }
 }
+Window['ObjectUtil'] = ObjectUtil;
