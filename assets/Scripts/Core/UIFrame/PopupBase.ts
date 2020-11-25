@@ -1,3 +1,16 @@
+/**
+ * 弹窗的数据
+ *
+ * @interface PopupConfig
+ */
+export interface PopupConfig {
+    type: string,
+    data: any
+}
+
+import UIBase from "./UIBase";
+import { UIType } from "./UIDefine";
+
 const { ccclass, property } = cc._decorator;
 
 /**
@@ -6,10 +19,12 @@ const { ccclass, property } = cc._decorator;
  * @export
  * @class PopupBase
  * @extends {cc.Component}
- * @template Options
+ * @template PopupConfig
  */
 @ccclass
-export default class PopupBase<Options> extends cc.Component {
+export default class PopupBase<PopupConfig> extends UIBase {
+
+    protected _uiType: UIType = UIType.UI_PANEL;
 
     @property({ type: cc.Node, tooltip: CC_DEV && '背景遮罩' })
     public background: cc.Node = null;
@@ -24,7 +39,7 @@ export default class PopupBase<Options> extends cc.Component {
     public animTime: number = 0.3;
 
     /** 弹窗选项 */
-    protected options: Options = null;
+    protected config: PopupConfig = null;
 
     /** 弹窗流程结束回调（注意：该回调为 PopupManager 专用，重写 hide 函数时记得调用该回调） */
     protected finishCallback: Function = null;
@@ -41,11 +56,11 @@ export default class PopupBase<Options> extends cc.Component {
 
     /**
      * 展示弹窗
-     * @param options 弹窗选项
+     * @param config 弹窗选项
      */
-    public show(options?: Options): void {
+    public show(config?: PopupConfig): void {
         // 储存选项
-        this.options = options;
+        this.config = config;
         // 重置节点
         this.background.opacity = 0;
         this.background.active = true;
@@ -53,9 +68,9 @@ export default class PopupBase<Options> extends cc.Component {
         this.main.active = true;
         this.node.active = true;
         // 初始化
-        this.init(this.options);
+        this.init(this.config);
         // 更新样式
-        this.updateDisplay(this.options);
+        this.updateDisplay(this.config);
         // 播放背景动画
         cc.tween(this.background)
             .to(this.animTime * 0.8, { opacity: 200 })
@@ -111,13 +126,13 @@ export default class PopupBase<Options> extends cc.Component {
     /**
      * 初始化（子类请重写此函数以实现自定义逻辑）
      */
-    protected init(options: Options): void { }
+    protected init(config: PopupConfig): void { }
 
     /**
      * 更新样式（子类请重写此函数以实现自定义样式）
-     * @param options 弹窗选项
+     * @param config 弹窗选项
      */
-    protected updateDisplay(options: Options): void { }
+    protected updateDisplay(config: PopupConfig): void { }
 
     /**
      * 设置弹窗完成回调（该回调为 PopupManager 专用）

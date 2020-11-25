@@ -1,9 +1,9 @@
 /**
- * 节点工具
- * NodeUtil.ts
+ * 节点相关工具
+ *      getRelativePosition:获取节点在目标节点（容器）下的相对位置
+ *      bPosOnNodeRect:坐标是否在目标节点范围内
  */
 let NodeUtil = new class {
-
     /**
      * 获取节点在目标节点（容器）下的相对位置
      * @param node 节点
@@ -19,21 +19,9 @@ let NodeUtil = new class {
      * @param pos 坐标
      * @param target 目标节点
      */
-    public static isPosOnNodeRect(pos: cc.Vec2, target: cc.Node): boolean {
+    public static bPosOnNodeRect(pos: cc.Vec2, target: cc.Node): boolean {
         const rect = target.getBoundingBoxToWorld();
         return rect.contains(pos);
-    }
-
-    /**
-     * 两个节点是否重叠
-     * @param node1 节点 1
-     * @param node2 节点 2
-     * @param contains 是否完全包含
-     */
-    public static areNodesOverlap(node1: cc.Node, node2: cc.Node, contains: boolean = false): boolean {
-        const rect2 = node2.getBoundingBoxToWorld();
-        const rect1 = node1.getBoundingBoxToWorld();
-        return contains ? rect2.containsRect(rect1) : rect2.intersects(rect1);
     }
 }
 Window['NodeUtil'] = NodeUtil;

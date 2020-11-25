@@ -1,10 +1,7 @@
 /**
  * 音频控制类
- *
- * @export
- * @class AudioMgr
  */
-export default class AudioMgr {
+let AudioMgr = new class {
 
     private static _music: Map<cc.AudioClip, number> = new Map();
 
@@ -228,3 +225,4 @@ export default class AudioMgr {
         this.setMasterVolume(0.0);
     }
 }
+window['AudioMgr'] = AudioMgr;

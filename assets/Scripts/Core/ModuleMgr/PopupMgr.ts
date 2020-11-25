@@ -30,16 +30,14 @@ export enum PopupCacheMode {
     Frequent = 3
 }
 
-/*************************************** PopupMgr ***************************************/
-import PopupBase from "../Base/PopupBase";
 
+
+/*************************************** PopupMgr ***************************************/
+import PopupBase from "../UIFrame/PopupBase";
 /**
  * 弹窗管理类
- *
- * @export
- * @class PopupMgr
  */
-export default class PopupMgr {
+let PopupMgr = new class {
 
     /** 预制体表 */
     private static _prefabMap: Map<string, cc.Prefab> = new Map<string, cc.Prefab>();
@@ -253,5 +251,5 @@ export default class PopupMgr {
             prefab = null;
         }
     }
-
 }
+window['PopupMgr'] = PopupMgr;

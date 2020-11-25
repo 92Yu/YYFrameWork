@@ -6,11 +6,10 @@ interface CallBackSubscription {
 
 /**
  * 事件管理类
- * @example 
  * EventManager.on('start', this.onStart, this);
  * EventManager.emit('start');
  */
-export default class EventMgr {
+let EventMgr = new class {
 
     private static events: Map<string, CallBackSubscription[]> = new Map<string, CallBackSubscription[]>();
 
@@ -114,5 +113,5 @@ export default class EventMgr {
         this.events.clear();
         this.onceEvents.clear();
     }
-
 }
+window['EventMgr'] = EventMgr;
