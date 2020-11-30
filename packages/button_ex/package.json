@@ -1,0 +1,22 @@
+{
+  "name": "button_ex",
+  "version": "0.0.1",
+  "description": "扩展按钮组件：点击音效、子节点位移、多次点击、长按",
+  "author": "MartinYing",
+  "main": "main.js",
+  "main-menu": {
+    "i18n:MAIN_MENU.package.title/button_ex/open": {
+      "message": "button_ex:open"
+    },
+    "i18n:MAIN_MENU.package.title/button_ex/hello": {
+      "message": "button_ex:say-hello"
+    }
+  },
+  "panel": {
+    "main": "panel/index.js",
+    "type": "dockable",
+    "title": "ButtonEx",
+    "width": 400,
+    "height": 300
+  }
+}
