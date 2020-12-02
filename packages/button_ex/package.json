@@ -5,18 +5,8 @@
   "author": "MartinYing",
   "main": "main.js",
   "main-menu": {
-    "i18n:MAIN_MENU.package.title/button_ex/open": {
-      "message": "button_ex:open"
-    },
-    "i18n:MAIN_MENU.package.title/button_ex/hello": {
+    "Extensions/button_ex": {
       "message": "button_ex:say-hello"
     }
-  },
-  "panel": {
-    "main": "panel/index.js",
-    "type": "dockable",
-    "title": "ButtonEx",
-    "width": 400,
-    "height": 300
   }
 }

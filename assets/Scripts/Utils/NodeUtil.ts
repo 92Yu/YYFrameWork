@@ -9,7 +9,7 @@ let NodeUtil = new class {
      * @param node 节点
      * @param target 目标节点（容器）
      */
-    public static getRelativePosition(node: cc.Node, target: cc.Node): cc.Vec2 {
+    public getRelativePosition(node: cc.Node, target: cc.Node): cc.Vec2 {
         const worldPos = (node.getParent() || node).convertToWorldSpaceAR(node.getPosition());
         return target.convertToNodeSpaceAR(worldPos);
     }
@@ -19,7 +19,7 @@ let NodeUtil = new class {
      * @param pos 坐标
      * @param target 目标节点
      */
-    public static bPosOnNodeRect(pos: cc.Vec2, target: cc.Node): boolean {
+    public bPosOnNodeRect(pos: cc.Vec2, target: cc.Node): boolean {
         const rect = target.getBoundingBoxToWorld();
         return rect.contains(pos);
     }

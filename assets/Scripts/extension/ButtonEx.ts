@@ -1,10 +1,9 @@
 /**
  * @export
  * @class ButtonEx
- * @extends {cc.Button}
  * 
  * @author MartinYing
- * @description 扩展button组件，添加一下4个功能
+ * @description 扩展 button 组件，添加以下4个功能
  *  1. 添加按钮音效，直接拖拽即可
  *  2. 添加图片模式下子节点跟随移动功能，移动距离用 childOffest 变量控制
  *  3. 添加按钮连续点击的屏蔽功能，屏蔽时长用  blockTime 变量控制
@@ -208,7 +207,7 @@ export default class ButtonEx extends cc.Button {
     }
 
     /** 添加一个长按事件 */
-    addLongPressEvent(startFunc: Function, endFunc: Function, target: Object) {
+    public addLongPressEvent(startFunc: Function, endFunc: Function, target: Object) {
         this.node.off('LongPressStart');
         this.node.off('LongPressEnd');
         this.node.on('LongPressStart', startFunc, target);

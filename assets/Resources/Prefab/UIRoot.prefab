@@ -84,7 +84,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "nodePanel",
+    "_name": "PreNodePanel",
     "_objFlags": 0,
     "_parent": {
       "__id__": 1
@@ -155,7 +155,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "nodePopup",
+    "_name": "PrenodePopup",
     "_objFlags": 0,
     "_parent": {
       "__id__": 1
@@ -226,7 +226,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "nodeTip",
+    "_name": "PrenodeTip",
     "_objFlags": 0,
     "_parent": {
       "__id__": 1
@@ -297,7 +297,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "nodeErr",
+    "_name": "PrenodeErr",
     "_objFlags": 0,
     "_parent": {
       "__id__": 1

@@ -8,7 +8,7 @@ export default class TestScene extends cc.Component {
     @property(ButtonEx) private btnTest: ButtonEx = null;
 
     start() {
-        this.btnTest.addLongClick(() => {
+        this.btnTest.addLongPressEvent(() => {
             console.log(`longtouch Start`);
         }, () => {
             console.log(`longtouch End`);

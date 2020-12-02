@@ -3,7 +3,7 @@ import { UIType } from "./UIDefine";
 
 export interface UIClass<T extends UIBase> {
     new(): T;
-    uiType(): any;
+    uiType(): UIType;
 }
 
 const { ccclass, property } = cc._decorator;
