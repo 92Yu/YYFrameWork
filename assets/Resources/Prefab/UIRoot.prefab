@@ -84,7 +84,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "PreNodePanel",
+    "_name": "PreNodeLayer",
     "_objFlags": 0,
     "_parent": {
       "__id__": 1

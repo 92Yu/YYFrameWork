@@ -1,5 +1,6 @@
 /**
  * 数组工具
+ * @author MartinYing
  */
 let ArrayUtil = new class {
 

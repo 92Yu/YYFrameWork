@@ -1,6 +1,7 @@
 const { ccclass, property } = cc._decorator;
 /**
  * UI自适应
+ * @author MartinYing
  */
 @ccclass
 export default class UIAdapterMgr extends cc.Component {

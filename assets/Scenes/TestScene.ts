@@ -1,4 +1,4 @@
-import ButtonEx from "../scripts/extension/ButtonEx";
+import ButtonEx from "../scripts/compEx/ButtonEx";
 
 const { ccclass, property } = cc._decorator;
 
@@ -13,6 +13,21 @@ export default class TestScene extends cc.Component {
         }, () => {
             console.log(`longtouch End`);
         }, this);
+
+        let map: { [key: string]: number } = cc.js.createMap(true);
+        map['str'] = 1;
+        map['str2'] = 2;
+        map['str3'] = 3;
+        console.log(map)
+        for (const key in map) {
+            if (Object.prototype.hasOwnProperty.call(map, key)) {
+                const element = map[key];
+                console.log(`${key}`);
+                console.log(`${map[key]}`);
+                delete map[key];
+                console.log(map);
+            }
+        }
     }
 
     // update (dt) {}

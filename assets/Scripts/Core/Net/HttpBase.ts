@@ -1,5 +1,6 @@
 /**
- * HTTP
+ * HTTP基类
+ * @author MartinYing
  */
 let HttpBase = {
     /**

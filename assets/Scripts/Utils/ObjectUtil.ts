@@ -1,6 +1,6 @@
 /**
  * 对象工具
- * ObjectUtil.ts
+ * @author MartinYing
  */
 let ObjectUtil = new class {
 

@@ -1,5 +1,6 @@
 /**
  * 数学工具
+ * @author MartinYing
  */
 let MathUtil = new class {
 

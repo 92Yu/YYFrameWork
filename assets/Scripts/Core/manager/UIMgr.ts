@@ -1,103 +1,167 @@
 import UIBase, { UIClass } from "../uiFrame/UIBase";
-import { UIType } from "../uiFrame/UIDefine";
+import { UI_TYPE } from "../uiFrame/UIDefine";
 
 
 /**
  * UI管理类
+ * @author MartinYing
  */
 let UIMgr = new class {
-    private _preNodePanel: cc.Node = null;
+    private _preNodeLayer: cc.Node = null;
     private _preNodePopup: cc.Node = null;
     private _preNodeTip: cc.Node = null;
-    private _preNodeError: cc.Node = null;
+    private _preNodeTop: cc.Node = null;
 
-    /** 存储弹出的窗体 */
-    private _staCurrentUIForms: Array<UIBase> = [];
-    /** 所有的窗体 */
-    private _mapAllUIForms: { [key: string]: UIBase } = cc.js.createMap();
-    /** 正在显示的窗体(不包括弹窗) */
-    private _mapCurrentShowUIForms: { [key: string]: UIBase } = cc.js.createMap();
-    /** 独立窗体 独立于其他窗体, 不受其他窗体的影响 */
-    private _mapIndependentForms: { [key: string]: UIBase } = cc.js.createMap();
-    /** 正在加载的form */
-    private _mapLoadingForm: { [key: string]: boolean } = cc.js.createMap();
-
-    private uiList: UIBase[] = [];
-    private uiRoot: cc.Node = null;
+    /** 存储弹出的视图 */
+    private _stackCurrentUIViews: { [key: string]: UIBase } = cc.js.createMap();
+    /** 所有的视图 */
+    private _mapAllUIViews: { [key: string]: UIBase } = cc.js.createMap();
+    /** 所有的Layer视图 */
+    private _mapAllLayerViews: { [key: string]: UIBase } = cc.js.createMap();
+    /** 所有的Popup视图 */
+    private _mapAllPopupViews: { [key: string]: UIBase } = cc.js.createMap();
+    /** 所有的Tip视图 */
+    private _mapAllTipViews: { [key: string]: UIBase } = cc.js.createMap();
+    /** 所有的Error视图 */
+    private _mapAllErrorViews: { [key: string]: UIBase } = cc.js.createMap();
 
     constructor() {
-
+        this._mapAllUIViews = cc.js.createMap();
+        this._mapAllLayerViews = cc.js.createMap();
+        this._mapAllPopupViews = cc.js.createMap();
+        this._mapAllTipViews = cc.js.createMap();
+        this._mapAllErrorViews = cc.js.createMap();
     }
 
-    private getUITypeNode(type: UIType) {
-        switch (type) {
-            case UIType.UI_PANEL:
-                return cc.find('PreNodePanel');
-            case UIType.UI_POPUP:
-                return cc.find('PreNodePopup');
-            case UIType.UI_TIP:
-                return cc.find('PreNodeTip');
-            case UIType.UI_ERROR:
-                return cc.find('PreNodeError');
-        }
-    }
-
-    /**
-     * 加载一个预制窗体到内存中
-     *
-     */
-    public loadForm(formPath: string) {
-        if (formPath == "" || formPath == null) {
+    public openView<T extends UIBase>(uiClass: UIClass<T>, zOrder?: number, callback?: Function, ...args: any[]) {
+        if (this.getView(uiClass)) {
             return;
         }
 
-        let pre = cc.assetManager.loadAny(formPath);
-        // let pre = await ResMgr.inst.loadForm(formPath);
-        if (!pre) {
-            cc.warn(`${formPath} 资源加载失败, 请确认路径是否正确`);
-            return;
+        cc.resources.load(uiClass.uiPath(), (error, prefab: cc.Prefab) => {
+            if (error) {
+                console.log(error);
+                return;
+            }
+            let uiNode: cc.Node = cc.instantiate(prefab);
+            let ui = uiNode.getComponent(uiClass) as UIBase;
+            switch (ui.uiType) {
+                case UI_TYPE.UI_LAYER:
+                    // cc.director.getScene().getChildByName('Canvas').getChildByName('UIRoot').getChildByName('PreNodeLayer');
+                    cc.find('PreNodeLayer').addChild(uiNode);
+                    if (this._mapAllLayerViews[uiClass.uiPath()]) {
+                        this._mapAllLayerViews[uiClass.uiPath()] = ui;
+                    }
+                case UI_TYPE.UI_POPUP:
+                    // cc.director.getScene().getChildByName('Canvas').getChildByName('UIRoot').getChildByName('PreNodePopup');
+                    cc.find('PreNodePopup').addChild(uiNode);
+                    if (this._mapAllPopupViews[uiClass.uiPath()]) {
+                        this._mapAllPopupViews[uiClass.uiPath()] = ui;
+                    }
+                case UI_TYPE.UI_TIP:
+                    // cc.director.getScene().getChildByName('Canvas').getChildByName('UIRoot').getChildByName('PreNodeTip');
+                    cc.find('PreNodeTip').addChild(uiNode);
+                    if (this._mapAllTipViews[uiClass.uiPath()]) {
+                        this._mapAllTipViews[uiClass.uiPath()] = ui;
+                    }
+                case UI_TYPE.UI_ERROR:
+                    // cc.director.getScene().getChildByName('Canvas').getChildByName('UIRoot').getChildByName('PrenodeErr');
+                    cc.find('PrenodeErr').addChild(uiNode);
+                    if (this._mapAllErrorViews[uiClass.uiPath()]) {
+                        this._mapAllErrorViews[uiClass.uiPath()] = ui;
+                    }
+            }
+            if (zOrder) {
+                uiNode.zIndex = zOrder;
+            }
+            if (this._mapAllUIViews[uiClass.uiPath()]) {
+                this._mapAllUIViews[uiClass.uiPath()] = ui;
+            }
+            if (callback) {
+                callback(args);
+            }
+            uiNode.active = false;
+        });
+    }
+
+    public closeView<T extends UIBase>(uiClass: UIClass<T>) {
+        if (this._mapAllUIViews[uiClass.uiPath()]) {
+            this._mapAllUIViews[uiClass.uiPath()].node.removeFromParent(true);
+            delete this._mapAllUIViews[uiClass.uiPath()];
         }
-        let node: cc.Node = cc.instantiate(pre);
-        let baseUI = node.getComponent(UIBase);
-        if (baseUI == null) {
-            cc.warn(`${formPath} 没有绑定UIBase的Component`);
-            return;
+        if (this._mapAllLayerViews[uiClass.uiPath()]) {
+            delete this._mapAllUIViews[uiClass.uiPath()];
         }
-        node.active = false;
-        let parentNode = this.getUITypeNode(baseUI.uiType);
-        parentNode.addChild(node);
-
-        return baseUI;
+        if (this._mapAllPopupViews[uiClass.uiPath()]) {
+            delete this._mapAllUIViews[uiClass.uiPath()];
+        }
+        if (this._mapAllTipViews[uiClass.uiPath()]) {
+            delete this._mapAllUIViews[uiClass.uiPath()];
+        }
+        if (this._mapAllErrorViews[uiClass.uiPath()]) {
+            delete this._mapAllUIViews[uiClass.uiPath()];
+        }
     }
 
-    /**
-     * 添加窗体到其所在分类的节点上
-     *
-     * @param {*} uiForm
-     */
-    public addForm(uiForm) {
-
+    public getView<T extends UIBase>(uiClass: UIClass<T>): UIBase {
+        if (this._mapAllUIViews[uiClass.uiPath()]) {
+            return this._mapAllUIViews[uiClass.uiPath()];
+        }
+        return null;
     }
 
-    /**
-     * 删除一个窗体
-     *
-     */
-    public removeForm() {
-
+    public showView<T extends UIBase>(uiClass: UIClass<T>, callback?: Function) {
+        let ui = this.getView(uiClass);
+        if (ui) {
+            ui.node.active = true;
+            if (callback) {
+                callback();
+            }
+        }
+        else {
+            this.openView(uiClass, 0, () => {
+                callback && callback();
+                let ui = this.getView(uiClass);
+                ui.node.active = true;
+            });
+        }
     }
 
-    public removeAllPanel() {
-
+    public closeAllLayer() {
+        for (const key in this._mapAllLayerViews) {
+            if (Object.prototype.hasOwnProperty.call(this._mapAllLayerViews, key)) {
+                const element = this._mapAllLayerViews[key];
+                element.node.removeFromParent(true);
+                delete this._mapAllLayerViews[key];
+            }
+        }
     }
-    public removeAllPopup() {
-
+    public closeAllPopup() {
+        for (const key in this._mapAllPopupViews) {
+            if (Object.prototype.hasOwnProperty.call(this._mapAllPopupViews, key)) {
+                const element = this._mapAllPopupViews[key];
+                element.node.removeFromParent(true);
+                delete this._mapAllPopupViews[key];
+            }
+        }
     }
-    public removeAllTip() {
-
+    public closeAllTip() {
+        for (const key in this._mapAllTipViews) {
+            if (Object.prototype.hasOwnProperty.call(this._mapAllTipViews, key)) {
+                const element = this._mapAllTipViews[key];
+                element.node.removeFromParent(true);
+                delete this._mapAllTipViews[key];
+            }
+        }
     }
-    public removeAllError() {
-
+    public closeAllError() {
+        for (const key in this._mapAllErrorViews) {
+            if (Object.prototype.hasOwnProperty.call(this._mapAllErrorViews, key)) {
+                const element = this._mapAllErrorViews[key];
+                element.node.removeFromParent(true);
+                delete this._mapAllErrorViews[key];
+            }
+        }
     }
-}
+}();
 window['UIMgr'] = UIMgr;

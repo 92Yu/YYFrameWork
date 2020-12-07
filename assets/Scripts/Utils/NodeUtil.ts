@@ -1,7 +1,6 @@
 /**
  * 节点相关工具
- *      getRelativePosition:获取节点在目标节点（容器）下的相对位置
- *      bPosOnNodeRect:坐标是否在目标节点范围内
+ * @author MartinYing
  */
 let NodeUtil = new class {
     /**

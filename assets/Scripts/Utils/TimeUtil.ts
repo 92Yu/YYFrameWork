@@ -1,6 +1,6 @@
 /**
  * 时间工具
- * TimeUtil.ts 
+ * @author MartinYing
  */
 let TimeUtil = new class {
 
@@ -36,7 +36,8 @@ let TimeUtil = new class {
     }
 
     /**
-     * 获取当前时间戳
+     * 获取当前时间戳 
+     * @returns 时间戳（单位：毫秒）
      */
     public static getCurrentTimestamp(): number {
         return new Date().getTime();

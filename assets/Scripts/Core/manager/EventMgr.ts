@@ -6,8 +6,10 @@ interface CallBackSubscription {
 
 /**
  * 事件管理类
- * EventManager.on('start', this.onStart, this);
- * EventManager.emit('start');
+ * @author MartinYing
+ * @example
+ *      EventManager.on('start', this.onStart, this);
+ *      EventManager.emit('start');
  */
 let EventMgr = new class {
 
@@ -113,5 +115,5 @@ let EventMgr = new class {
         this.events.clear();
         this.onceEvents.clear();
     }
-}
+}();
 window['EventMgr'] = EventMgr;

@@ -1,5 +1,6 @@
 /**
  * 音频控制类
+ * @author MartinYing
  */
 let AudioMgr = new class {
 
@@ -224,5 +225,7 @@ let AudioMgr = new class {
     public mute(): void {
         this.setMasterVolume(0.0);
     }
-}
+}();
 window['AudioMgr'] = AudioMgr;
+// (<any>window).yy || ((<any>window).yy = {});
+// (<any>window).yy.AudioMgr = AudioMgr;

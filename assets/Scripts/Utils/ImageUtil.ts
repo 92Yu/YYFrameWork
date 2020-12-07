@@ -1,6 +1,6 @@
 /**
  * 图像工具
- * ImageUtil.ts
+ * @author MartinYing
  */
 let ImageUtil = new class{
 

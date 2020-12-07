@@ -1,6 +1,6 @@
 /**
  * 调试工具
- * DebugUtil.ts
+ * @author MartinYing
  */
 let DebugUtil = new class{
 
